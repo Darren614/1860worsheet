@@ -1,281 +1,169 @@
 // IntegerDivision.asm
-
-// Save R0 and R1 into temporary registers
 @R0
 D=M
-@R5
-M=D             // R5 = x
+@x
+M=D         // x = R0
 @R1
 D=M
-@R6
-M=D             // R6 = y
+@y
+M=D         // y = R1
 
-// Check if y is zero (invalid division)
-@R6
+// Check that the divisor is 0
+@y
 D=M
-@INVALID_DIVISION_BY_ZERO
-D;JEQ
+@DIVIDE_BY_ZERO
+D;JEQ       // if y=0 jump
 
-// Check if x is -32768 and y is -1 (invalid division)
-@R5
+// 检查溢出情况（x=-32768且y=-1）
+@x
 D=M
 @32768
-D=D+A           // If x == -32768, D == 0
-@CHECK_Y_MINUS1
-D;JEQ
-@VALID_DIVISION
+D=D+A       // D = x + 32768
+@CHECK_Y
+D;JEQ       // if x=-32768 check y
+
+// Normal division process
+@PROCEED
 0;JMP
 
-(CHECK_Y_MINUS1)
-@R6
+(CHECK_Y)
+@y
 D=M
 @1
-D=D+A           // If y == -1, D == 0
-@INVALID_OVERFLOW
+D=D+A       // D = y + 1
+@OVERFLOW
+D;JEQ       // if y=-1 jump
+
+(PROCEED)
+// Compute symbol mark
+@x
+D=M
+@x_sign
+M=0         //  default x is non-negative
+@X_NEG
+D;JLT       // If x is negative, jump
+(X_RETURN)
+@y
+D=M
+@y_sign
+M=0         // default y is non-negative
+@Y_NEG
+D;JLT       // If y is negative, jump
+(Y_RETURN)
+
+//Calculated absolute value
+@x
+D=M
+@x_abs
+M=D
+@x_sign
+D=M
+@SKIP_X_NEG
 D;JEQ
-@VALID_DIVISION
+@x_abs
+M=!M
+M=M+1       // x_abs = -x
+(SKIP_X_NEG)
+
+@y
+D=M
+@y_abs
+M=D
+@y_sign
+D=M
+@SKIP_Y_NEG
+D;JEQ
+@y_abs
+M=!M
+M=M+1       // y_abs = -y
+(SKIP_Y_NEG)
+
+//variable initialization
+@x_abs
+D=M
+@remainder
+M=D         // remainder = x_abs
+@m_abs
+M=0         // m_abs = 0
+
+// Division loop
+(LOOP)
+@remainder
+D=M
+@y_abs
+D=D-M
+@END_LOOP
+D;JLT       // if remainder < y_abs，END
+@y_abs
+D=M
+@remainder
+M=M-D       // remainder -= y_abs
+@m_abs
+M=M+1       // m_abs += 1
+@LOOP
 0;JMP
 
-(INVALID_DIVISION_BY_ZERO)
-@0
-D=A
+(END_LOOP)
+// Adjust quotient symbol
+@x_sign
+D=M
+@y_sign
+D=D-M
+@SAME_SIGN
+D;JEQ       // Skip if the symbol is the same
+@m_abs
+M=-M        // If the signs are different, take the opposite
+(SAME_SIGN)
+
+//Adjust the remainder sign
+@x_sign
+D=M
+@Q_POS
+D;JEQ       
+@remainder
+M=-M       
+(Q_POS)
+
+// 存储结果
+@m_abs
+D=M
 @R2
-M=D             // R2 = 0
+M=D         // R2 = m
+@remainder
+D=M
 @R3
-M=D             // R3 = 0
-@1
-D=A
+M=D         // R3 = q
 @R4
-M=D             // R4 = 1 (invalid)
+M=0         // R4 = 0（valid）
 @END
 0;JMP
 
-(INVALID_OVERFLOW)
-@0
-D=A
-@R2
-M=D             // R2 = 0
-@R3
-M=D             // R3 = 0
-@1
-D=A
+// 异常处理分支
+(DIVIDE_BY_ZERO)
 @R4
-M=D             // R4 = 1 (invalid)
+M=1         // R4 = 1（invalid）
 @END
 0;JMP
 
-(VALID_DIVISION)
-// Compute signs of x and y
-@R5
-D=M
-@X_IS_NEGATIVE
-D;JLT
-(X_IS_POSITIVE)
-@sign_x
-M=1
-@CHECK_Y_SIGN
-0;JMP
-(X_IS_NEGATIVE)
-@sign_x
-M=-1
-
-(CHECK_Y_SIGN)
-@R6
-D=M
-@Y_IS_NEGATIVE
-D;JLT
-(Y_IS_POSITIVE)
-@sign_y
-M=1
-@COMPUTE_ABS_X
-0;JMP
-(Y_IS_NEGATIVE)
-@sign_y
-M=-1
-
-(COMPUTE_ABS_X)
-@R5
-D=M
-@abs_x
-M=D
-@abs_x
-D=M
-@MAKE_ABS_X_POS
-D;JGE
-@abs_x
-M=-D
-(MAKE_ABS_X_POS)
-
-(COMPUTE_ABS_Y)
-@R6
-D=M
-@abs_y
-M=D
-@abs_y
-D=M
-@MAKE_ABS_Y_POS
-D;JGE
-@abs_y
-M=-D
-(MAKE_ABS_Y_POS)
-
-// Compute quotient_abs (abs_x // abs_y)
-@quotient_abs
-M=0
-@abs_x
-D=M
-@remainder_abs
-M=D
-
-(DIV_LOOP)
-@abs_y
-D=M
-@remainder_abs
-D=M-D
-@END_DIV_LOOP
-D;JLT
-@abs_y
-D=M
-@remainder_abs
-M=M-D
-@quotient_abs
-M=M+1
-@DIV_LOOP
-0;JMP
-
-(END_DIV_LOOP)
-
-// Determine sign of m
-@sign_x
-D=M
-@sign_y
-D=D*M
-@sign_m
-M=D
-
-// Calculate m = quotient_abs * sign_m
-@quotient_abs
-D=M
-@sign_m
-D=D*M
-@m
-M=D
-
-// Compute product = y * m (using absolute values and sign)
-@R6
-D=M
-@abs_y_copy
-M=D
-@abs_y_copy
-D=M
-@MAKE_ABS_Y_COPY_POS
-D;JGE
-@abs_y_copy
-M=-D
-(MAKE_ABS_Y_COPY_POS)
-
-@m
-D=M
-@abs_m
-M=D
-@abs_m
-D=M
-@MAKE_ABS_M_POS
-D;JGE
-@abs_m
-M=-D
-(MAKE_ABS_M_POS)
-
-// Multiply abs_y_copy and abs_m
-@product_abs
-M=0
-@abs_m
-D=M
-@counter
-M=D
-
-(MULT_LOOP)
-@counter
-D=M
-@END_MULT
-D;JEQ
-@abs_y_copy
-D=M
-@product_abs
-M=M+D
-@counter
-M=M-1
-@MULT_LOOP
-0;JMP
-
-(END_MULT)
-
-// Determine product_sign
-@R6
-D=M
-@y_negative
-M=0
-@CHECK_Y_SIGN_FOR_PRODUCT
-D;JGE
-@y_negative
-M=1
-
-(CHECK_Y_SIGN_FOR_PRODUCT)
-@m
-D=M
-@m_negative
-M=0
-@CHECK_M_SIGN_FOR_PRODUCT
-D;JGE
-@m_negative
-M=1
-
-(CHECK_M_SIGN_FOR_PRODUCT)
-@y_negative
-D=M
-@m_negative
-D=D-M
-@SAME_SIGN_PRODUCT
-D;JEQ
-@product_sign
-M=-1
-@END_PRODUCT_SIGN
-0;JMP
-
-(SAME_SIGN_PRODUCT)
-@product_sign
-M=1
-
-(END_PRODUCT_SIGN)
-@product_abs
-D=M
-@product_sign
-D=D*M
-@product
-M=D
-
-// Compute q = x - product
-@R5
-D=M
-@product
-D=D-M
-@q
-M=D
-
-// Set R2, R3, R4
-@m
-D=M
-@R2
-M=D
-@q
-D=M
-@R3
-M=D
-@0
-D=A
+(OVERFLOW)
 @R4
-M=D
+M=1         
+@END
+0;JMP
+
+// Symbol calculation auxiliary label
+(X_NEG)
+@x_sign
+M=1         // x is negative
+@X_RETURN
+0;JMP
+
+(Y_NEG)
+@y_sign
+M=1         // y is negative
+@Y_RETURN
+0;JMP
 
 (END)
 @END
-0;JMP
+0;JMP       // END
