@@ -1,0 +1,170 @@
+CHIP Decoder201873449{
+    IN A, B, C, D;
+    OUT a;
+
+    PARTS:
+    Not(in=A, out=notA);
+    Not(in=B, out=notB);
+    Not(in=C, out=notC);
+    Not(in=D, out=notD);
+
+    And(a=A, b= notB, out=AnotB);
+    And(a=AnotB, b=notC, out=f1);
+
+    And(a=B, b=C, out=f2);
+
+    And(a=notA, b=notB, out=notAnotB);
+    And(notAnotB, b=C, out=f3);
+
+    And(a=notA, b=noB, out=notAnotB);
+    And(a=notC, b=notD, out=notCnotD);
+    And(a=notAnotB, b=notCnotD, out=f4);
+
+    And(a=A, b=B, out=AB);
+    And(a=notC, b=notD, out=notCnotD);
+    And(a=AB, b=notCnotD, out=f5);
+
+    And(a=A, b=notB, out=AnotB);
+    And(a=C, b=notD, out=CnotD);
+    And(a=AnotB, b=CnotD, out=f6);
+
+    Or(a=f1, b=f2, out=f12);
+    Or(a=f12, b=f3, out=f123);
+    Or(a=f123, b=f4, out=f1234);
+    Or(a=f1234, b=f5, out=f12345);
+    Or(a=f12345, b=f6, out=a);
+
+    IN A, B, C, D;
+    OUT b;
+
+    PARTS:
+        Not(in=A, out=notA);
+    Not(in=B, out=notB);
+    Not(in=C, out=notC);
+    Not(in=D, out=notD);
+
+    And(a=A, b=notB, out=term1);
+
+    And(a=B, b=notD, out=term2);
+
+    And(a=notA, b=notB, out=notAnotB);
+    And(a=notC, b=notD, out=notCnotD);
+    And(a=notAnotB, b=notCnotD, out=term3);
+
+    And(a=notA, b=B, out=notAB);
+    And(a=notC, b=D, out=notCD);
+    And(a=notAB, b=notCD, out=term4);
+
+    And(a=A, b=B, out=AB);
+    And(a=AB, b=C, out=term5);
+
+    Or(a=term1, b=term2, out=term12);
+    Or(a=term3, b=term4, out=term34);
+    Or(a=term12, b=term34, out=term1234);
+    Or(a=term1234, b=term5, out=b);
+
+    IN A, B, C, D;
+    OUT c;
+
+    PARTS:
+    Not(in=B, out=notB);
+    Not(in=D, out=notD);
+
+    And(a=A, b=B, out=AandB);
+    And(a=A, b=C, out=AandC);
+    And(a=notB, b=notD, out=notBandnotD);
+    And(a=C, b=notD, out=CandnotD);
+
+    Or(a=AandB, b=AandC, out=g1);
+    Or(a=notBandnotD, b=CandnotD, out=g2);
+
+    Or(a=g1, b=g2, out=c);
+
+
+    IN A, B, C, D;
+    OUT d;
+
+    PARTS:
+    Not (in=A, out=notA);
+    Not (in=B, out=notB);
+    Not (in=C, out=notC);
+    Not (in=D, out=notD);
+
+    And (a=A, b=notB, out=final1);
+
+    And (a=notA, b=B, out=BnotA);
+    And (a=BnotA, b=notC, out=final2);
+
+    And (a=notA, b=notB, out=notAnotB); 
+    And (a=notAnotB, b=C, out=final3); 
+
+    And (a=B, b=C, out=BC); 
+    And (a=BC, b=notD, out=final4); 
+
+    And (a=A, b=B, out=AB);
+    And (a=AB, b=D, out=final5); 
+
+    Or (a=final1, b=final2, out=final12);
+    Or (a=final3, b=final4, out=final34);
+    Or (a=final12, b=final34, out=final1234);
+    Or (a=final1234, b=final5, out=d);
+
+    IN A, B, C, D;
+    OUT e;
+
+    PARTS:
+    Not(in=A, out=notA);
+    Not(in=B, out=notB);
+    Not(in=C, out=notB);
+    Not(in=D, out=notD);
+
+    And(a=A, b=notC, out=f1);
+
+    And(a=notA, b=B, out=BnotA);
+    And(a=BnotA, b=D, out=f2);
+
+    And(a=notA, b=C, out=CnotA);
+    And(a=CnotA, b=D, out=f3);
+
+    And(a=notA, b=notB, out=notAnotB);
+    And(a=notC, b=notD, out=notCnotD);
+    And=(a=notAnotB, b=notCnotD, out=f4);
+
+    And(a=A, b=notB, out=AnotB);
+    And(a=C, b=notD, out=CnotD);
+    And(a=AnotB, b=CnotD, out=f5);
+
+    Or(a=f1, b=f2, out=f12);
+    Or(a=f12, b=f3, out=f123);
+    Or(a=f123, b=f4, out=f1234);
+    Or(a=f1234, b=f5, out=e);
+
+    IN A, B, C, D;
+    OUT f;
+
+    PARTS:
+    Not(in=A, out=notA);
+    Not(in=B, out=notB);
+    Not(in=C, out=notC);
+    Not(in=D, out=notD);
+
+    And(a=notA, b=notB, out=notAnotB);
+    And(a=notAnotB, b=notC, out=f1);
+
+    And(a=notA, b=C, out=CnotA);
+    And(CnotA, b=notD, out=f2);
+
+    And(a=notB, b=notC, out=notBnotC);
+    And(a=notBnotC, b=notD, out=f3);
+
+    And(a=A, b=notB, out=AnotB);
+    And(a=AnotB, b=notC, out=f4);
+
+    And(a=A, b=B, out=AB);
+    And(a=AB, b=C, out=f5);
+
+    Or(a=f1, b=f2, out=f12);
+    Or(a=f12, b=f3, out=f123);
+    Or(a=f123, b=f4, out=f1234);
+    Or(a=f1234, b=f5, out=f);
+}
