@@ -1,0 +1,31 @@
+function Xor.compute 0
+    // Load x and y into temporary variables (preserves original arguments)
+    push argument 0
+    pop temp 0       // temp 0 = x
+    push argument 1
+    pop temp 1       // temp 1 = y
+
+    // Compute (x OR y)
+    push temp 0
+    push temp 1
+    or               // stack: (x OR y)
+
+    // Compute (NOT x AND NOT y)
+    push temp 0
+    not
+    push temp 1
+    not
+    and              // stack: (NOT x AND NOT y), (x OR y)
+
+    // Compute XOR: (x OR y) AND NOT(NOT x AND NOT y)
+    not              // stack: NOT(NOT x AND NOT y), (x OR y)
+    and              // stack: (x OR y) AND NOT(NOT x AND NOT y) = x XOR y
+
+    // Store result in argument[2]
+    push argument 2
+    pop pointer 1    // THAT = argument[2]
+    pop that 0       // argument[2] = XOR result
+
+    // Leave result at the bottom of the stack
+    push that 0
+    return

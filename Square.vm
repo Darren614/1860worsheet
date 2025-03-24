@@ -1,0 +1,54 @@
+// Square.vm
+// Computes y = x² where x = argument[0]
+// Leaves result at bottom of stack, preserves argument[0]
+
+function Square.compute 0
+    // Copy x to temp register (preserve argument[0])
+    push argument 0
+    pop temp 0       // temp 0 = x
+
+    // Handle negative x by working with absolute value
+    push temp 0
+    push constant 0
+    lt               // Check if x < 0
+    if-goto NEGATIVE
+
+    // Positive case - use x directly
+    push temp 0
+    pop local 1      // local 1 = |x|
+    goto INIT
+
+    label NEGATIVE
+    push temp 0
+    neg
+    pop local 1      // local 1 = |x|
+
+    label INIT
+    // Initialize result (y = 0) and counter (i = |x|)
+    push constant 0
+    pop local 0      // local 0 (y) = 0
+
+    // Multiplication loop: y = y + |x|, repeated |x| times
+    label LOOP
+    push local 1     // Check if i == 0
+    push constant 0
+    eq
+    if-goto END_LOOP
+
+    push local 0
+    push temp 0      // Add original x (handles sign automatically)
+    add
+    pop local 0      // Update y
+
+    push local 1
+    push constant 1
+    sub
+    pop local 1      // i = i - 1
+
+    goto LOOP
+
+    label END_LOOP
+
+    // Push result to stack and return
+    push local 0
+    return
