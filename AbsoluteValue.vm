@@ -1,44 +1,44 @@
-function AbsoluteValue.compute 0
-    // Check for overflow case (x = -32768, since |−32768| = 32768 > 32767)
-    push argument 0
-    push constant 32768
-    neg               // -32768 (smallest 16-bit signed integer)
-    eq
-    if-goto OVERFLOW_CASE
+push argument 0    // Load x
+push constant 0    
+lt                 // Check if x < 0
+if-goto NEGATIVE   // Jump if x is negative
 
-    // Default case (no overflow)
-    push argument 0
-    push constant 0
-    lt                // Check if x < 0
-    if-goto NEGATIVE_CASE
+// Handle non-negative case
+push argument 0    // Push x (non-negative)
+pop argument 1     // Store x in argument[1]
+push constant 0    
+pop argument 2     // argument[2] = 0
+push constant 0    
+pop argument 3     // argument[3] = 0
+goto END
 
-    // Non-negative case (x ≥ 0)
-    push argument 0   // z = x
-    pop argument 1    // Store in argument[1]
-    push constant 0
-    pop argument 2    // argument[2] = 0 (x not negative)
-    push constant 0
-    pop argument 3    // argument[3] = 0 (no overflow)
-    goto END
+label NEGATIVE
+push argument 0    // Load x again
+neg                // Compute y = -x
+dup                // Duplicate y to check for overflow
+push constant 0    
+lt                 // Check if y < 0 (overflow)
+if-goto OVERFLOW   // Jump if overflow detected
 
-    label NEGATIVE_CASE
-    push argument 0
-    neg               // z = -x
-    pop argument 1    // Store in argument[1]
-    push constant 1
-    pop argument 2    // argument[2] = 1 (x was negative)
-    push constant 0
-    pop argument 3    // argument[3] = 0 (no overflow)
-    goto END
+// No overflow: store valid result
+pop argument 1     // Store y in argument[1]
+push constant 1    
+pop argument 2     // argument[2] = 1 (x was negative)
+push constant 0    
+pop argument 3     // argument[3] = 0 (no error)
+goto END
 
-    label OVERFLOW_CASE
-    push constant 0
-    pop argument 1    // argument[1] = 0 (undefined result)
-    push constant 1
-    pop argument 2    // argument[2] = 1 (x was negative)
-    push constant 1
-    pop argument 3    // argument[3] = 1 (overflow occurred)
+label OVERFLOW
+// Handle overflow case
+pop argument 1     // Store invalid y in argument[1]
+push constant 1    
+pop argument 2     // argument[2] = 1 (x was negative)
+push constant 1    
+pop argument 3     // argument[3] = 1 (error)
+goto END
 
-    label END
-    push argument 1   // Leave result z at the bottom of the stack
-    return
+label END
+// Infinite loop to halt execution
+(END)
+@END
+0;JMP
