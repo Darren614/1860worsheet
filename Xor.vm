@@ -1,18 +1,24 @@
-push argument 0    // Load x onto the stack
-push argument 1    // Load y onto the stack
-or                 // Compute x OR y
+// Load x and y
+push argument 0
+push argument 1
 
-push argument 0    // Reload x
-push argument 1    // Reload y
-and                // Compute x AND y
-not                // Negate the AND result to get NOT(x AND y)
+// Compute x OR y (stack: x|y)
+or
 
-and                // Compute (x OR y) AND NOT(x AND y) = x XOR y
+// Re-push x and y to compute AND
+push argument 0
+push argument 1
 
-pop argument 2     // Store result in argument[2]
-push argument 2    // Leave result at the bottom of the stack
+// Compute x AND y (stack: x|y, x&y)
+and
 
-// Infinite loop to halt execution
-(END)
-@END
-0;JMP
+// Negate the AND result (stack: x|y, ¬(x&y))
+not
+
+// Compute XOR: (x|y) ∧ ¬(x&y) (stack: z)
+and
+
+// Store result in argument[2] and leave it on the stack
+pop argument 2
+push argument 2
+

@@ -167,4 +167,35 @@ CHIP Decoder201873449{
     Or(a=f12, b=f3, out=f123);
     Or(a=f123, b=f4, out=f1234);
     Or(a=f1234, b=f5, out=f);
+
+
+    IN A, B, C, D;
+    OUT g;
+
+    PARTS:
+    Not(in=A, out=notA);
+    Not(in=B, out=notB);
+    Not(in=C, out=notC);
+    Not(in=D, out=notD);
+
+    And(a=A,b=notC,out=final1);
+   
+    And(a=notA,b=notB,out=and1);
+    And(a=and1,b=notD,out=final2);
+   
+    And(a=B,b=notC,out=and2);
+    And(a=and2,b=D,out=final3);
+
+    And(a=B,b=C,out=and3);
+    And(a=and3,b=notD,out=final4);
+
+    And(a=C,b=D,out=and4);
+    And(a=and4,b=notB,out=final5);
+
+    Or(a=final1,b=final2,out=or1);
+    Or(a=or1,b=final3,out=or2);
+    Or(a=or2,b=final4,out=or3);
+    Or(a=or3,b=final5,out=g);
+
+
 }

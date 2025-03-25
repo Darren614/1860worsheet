@@ -1,0 +1,40 @@
+CHIP P2S{
+IN indata[4], enable, load;
+    OUT sout, complete;
+
+    PARTS:
+    Register(in[0..3] = indata, in[4..15] = false, load = load, out[0] = bit1, out[1] = bit2, out[2] = bit3, out[3] = bit4);
+   
+    Not(in = load, out = notload);
+    Not(in = enable, out = notenable);
+    And(a = notload, b = enable, out = shift);
+
+    Not(in = shift0, out = notshift0);
+    Not(in = shift1, out = notshift1);
+    Not(in = shift2, out = notshift2);
+    Not(in = shift3, out = notshift3);
+
+    And(a = notshift0, b = notshift1, out = e1 );
+    And(a = notshift2, b = notshift3, out = e2);
+    And(a = e1, b = e2, out = e3);
+    And(a = e3, b = enable, out = enabled );
+
+    DFF(in = enabled, out = shift0);
+    DFF(in = shift0, out = shift1);
+    DFF(in = shift1, out = shift2);
+    DFF(in = shift2, out = shift3);
+
+    And(a=bit1, b=shift0, out=thebit1);
+    And(a=bit2, b=shift1, out=thebit2);
+    And(a=bit3, b=shift2, out=thebit3);
+    And(a=bit4, b=shift3, out=thebit4);
+
+    Or(a=thebit1, b=thebit2, out=bit1or2);
+    Or(a=thebit3, b=thebit4, out=bit3or4);
+    Or(a=bit1or2, b=bit3or4, out=sout);
+
+
+    And(a=true, b=shift3, out=complete);
+    
+
+}
