@@ -64,23 +64,25 @@ CHIP Decoder201873449{
 
     //d segment
 
-    And(a=notA, b=B, out=BnotA);
-    And(a=BnotA, b=notC, out=f1);
+    And(a=notA, b=B, out=NOTAANDBd);
+    And(a=NOTAANDBd, b=notC, out=w1d);
 
-    And(a=notA, b=notB, out=notAnotB);
-    And(a=notAnotB, b=C, out=f2);
+    And(a=notA, b=notB, out=NOTAANDNOTBd);
+    And(a=NOTAANDNOTBd, b=C, out=w2d);
 
-    And(a=A, b=B, out=AB);
-    And(a=AB, b=D, out=f3);
+    And(a=A, b=B, out=AANDBd);
+    And(a=AANDBd, b=D, out=w3d);
 
-    And(a=C, b=notD, out=f4);
+    And(a=C, b=notD, out=w4d);
+    
+    And(a=A, b=notB, out=w5d);
 
-    And(a=A, b=notB, out=f5);
+    Or(a=w1d, b=w2d, out=w6d);
+    Or(a=w3d, b=w4d, out=w7d);
+    Or(a=w6d, b=w7d, out=w8d);
+    Or(a=w8d, b=w5d, out=d);
 
-    Or(a=f1, b=f2, out=f12);
-    Or(a=f12, b=f3, out=f123);
-    Or(a=f123, b=f4, out=f1234);
-    Or(a=f1234, b=f5, out=d);
+
 
     //e segment
 
