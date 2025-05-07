@@ -1,21 +1,20 @@
-// compute z=x xor y, same as (x or y) and not(x and y)
-// not modified the value initially stored in R0 and R1
+// Xor.asm
+// Computes R2 = R0 XOR R1 using formula: (R0 OR R1) AND NOT (R0 AND R1)
 
 @R0
-D=M // D=x
+D=M          // Load R0 value into D register
 @R1
-D=D&M // D=x or y
-D=!D // D=not(x or y)
-//stored value at here temporarily
+D=D&M        // D = R0 & R1 (bitwise AND)
+D=!D         // Invert bits: D = not(R0 & R1)
 @temp1
-M=D 
+M=D          // Store intermediate result: temp1 = NOT(R0 AND R1)
 
 @R0
-D=M
+D=M          // Reload original R0 value
 @R1
-D=D|M
+D=D|M        // D = R0 | R1 (bitwise OR)
 @temp1
-D=D&M
+D=D&M        // Final calculation: D = (R0|R1) and not(R0&R1) → XOR result
 @R2
-M=D
+M=D          // Store final result in R2
 
