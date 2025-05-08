@@ -29,8 +29,10 @@ M=0          // Set overflow flag (R3=0)
 0;JMP        // Jump to end
 
 (IS_MIN)  // Handle -32768 special case
+@R0        // Load original value address
+D=M        // Get original value (-32768)
 @R1
-M=-1         //  ERROR! Should preserve original R0 value
+M=D        // Preserve R1=R0 as required
 @R2
 M=1          // Set negative flag (R2=1)
 @R3
